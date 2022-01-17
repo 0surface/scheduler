@@ -7,9 +7,14 @@ function AllEventsPage(props) {
   const router = useRouter()
   const events = getAllEvents()
 
+  function findEventsHandler(year, month) {
+    const fullPath = `/events/${year}/${month}`
+    router.push(fullPath)
+  }
+
   return (
     <div>
-      <EventsSearch />
+      <EventsSearch onSearch={findEventsHandler} />
       <EventList items={events} />
     </div>
   )
