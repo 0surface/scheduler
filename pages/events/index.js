@@ -1,16 +1,16 @@
-import React from 'react'
 import { useRouter } from 'next/router'
+import { getAllEvents } from '../../data/dummy-data'
+import EventList from '../../components/events/EventList'
+import EventsSearch from '../../components/events/EventsSearch'
 
 function AllEventsPage(props) {
   const router = useRouter()
+  const events = getAllEvents()
+
   return (
     <div>
-      <h1>This is the Events Page</h1>
-      <h3>All events are displayed here</h3>
-      <h4>
-        Router query = {JSON.stringify(router.query)} | Pathname ={' '}
-        {JSON.stringify(router.pathname)}
-      </h4>
+      <EventsSearch />
+      <EventList items={events} />
     </div>
   )
 }
