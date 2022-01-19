@@ -1,3 +1,6 @@
+const { FIREBASE_API_URL } = process.env
+const FIREBASE_API_EVENTS_URL = `${FIREBASE_API_URL}/events.json` ///process.env
+
 export function transformEventData(data) {
   const transformed = []
   for (const key in data) {
@@ -15,16 +18,20 @@ export function transformEventData(data) {
   return transformed
 }
 
-export function getFeaturedEvents(data) {
-  return data.filter((event) => event.isFeatured)
+export async function getFeaturedEvents() {
+  const events = await getAllEvents()
+  return events.filter((event) => event.isFeatured)
 }
 
-export function getAllEvents() {
-  return data
+export async function getAllEvents() {
+  const response = await fetch(FIREBASE_API_EVENTS_URL)
+  const data = await response.json()
+  return transformEventData(data)
 }
 
-export function getFilteredEvents(data, dateFilter) {
+export async function getFilteredEvents(dateFilter) {
   const { year, month } = dateFilter
+  const data = await getAllEvents()
 
   let filteredEvents = data.filter((event) => {
     const eventDate = new Date(event.date)
@@ -36,6 +43,7 @@ export function getFilteredEvents(data, dateFilter) {
   return filteredEvents
 }
 
-export function getEventById(data, id) {
+export async function getEventById(id) {
+  const data = await getAllEvents()
   return data.find((event) => event.id === id)
 }
