@@ -1,17 +1,16 @@
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
-import { getEventById } from '../../data/dummy-data'
+import { getEventById } from '../../api/api-methods'
+
 import EventSummary from '../../components/event-detail/event-summary'
 import EventLogistics from '../../components/event-detail/event-logistics'
 import EventContent from '../../components/event-detail/event-content'
 import ErrorAlert from '../../components/ui/error-alert'
 
 function EventDetailPage(props) {
-  const router = useRouter()
-  const eventId = router.query.eventId
-  const event = getEventById(eventId)
+  const { event } = props
 
-  if (!event) {
+  if (!props.event) {
     return (
       <ErrorAlert>
         <p>No event found!</p>
@@ -36,3 +35,14 @@ function EventDetailPage(props) {
 }
 
 export default EventDetailPage
+
+export async function getServerSideProps(context) {
+  const eventId = context.params.eventId
+  const event = await getEventById(eventId)
+
+  return {
+    props: {
+      event: event,
+    },
+  }
+}

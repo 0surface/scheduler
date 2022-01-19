@@ -1,34 +1,15 @@
-import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 
-import { getFilteredEvents } from '../../data/dummy-data'
+import { getFilteredEvents } from '../../api/api-methods'
 import Button from '../../components/ui/button'
 import ErrorAlert from '../../components/ui/error-alert'
 import EventList from '../../components/events/EventList'
 import ResultsTitle from '../../components/events/results-title'
 
 function FiltredEventsPage(props) {
-  const router = useRouter()
-  const filterData = router.query.slug
+  const { slugIsValid, numYear, numMonth, filteredEvents, hasEvents } = props
 
-  if (!filterData) {
-    return <p className="center">Loading ...</p>
-  }
-
-  const filteredYear = filterData[0]
-  const filteredMonth = filterData[1]
-
-  const numYear = +filteredYear
-  const numMonth = +filteredMonth
-  module
-  if (
-    isNaN(numYear) ||
-    isNaN(numMonth) ||
-    numYear > 2030 ||
-    numYear < 2021 ||
-    numMonth < 1 ||
-    numMonth > 12
-  ) {
+  if (!slugIsValid) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -41,12 +22,7 @@ function FiltredEventsPage(props) {
     )
   }
 
-  const filteredEvents = getFilteredEvents({
-    year: numYear,
-    month: numMonth,
-  })
-
-  if (!filteredEvents | (filteredEvents.length === 0)) {
+  if (!hasEvents) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -70,3 +46,52 @@ function FiltredEventsPage(props) {
 }
 
 export default FiltredEventsPage
+
+function getSlugData(filterData) {
+  const filteredYear = filterData[0]
+  const filteredMonth = filterData[1]
+
+  const numYear = +filteredYear
+  const numMonth = +filteredMonth
+
+  let isValid =
+    isNaN(numYear) ||
+    isNaN(numMonth) ||
+    numYear > 2030 ||
+    numYear < 2021 ||
+    numMonth < 1 ||
+    numMonth > 12
+      ? false
+      : true
+
+  return { numYear, numMonth, isValid }
+}
+
+export async function getServerSideProps(context) {
+  let filteredEvents = []
+  let numYear
+  let numMonth
+  const slug = getSlugData(context.params.slug)
+  const slugIsValid = slug && slug.isValid
+  if (slugIsValid) {
+    numYear = slug.numYear
+    numMonth = slug.numMonth
+  }
+
+  if (slugIsValid) {
+    filteredEvents = await getFilteredEvents({
+      year: numYear,
+      month: numMonth,
+    })
+  }
+
+  return {
+    props: {
+      slugIsValid,
+      numYear,
+      numMonth,
+      filteredEvents,
+      hasEvents: filteredEvents && filteredEvents.length > 0,
+    },
+  }
+}
