@@ -1,6 +1,5 @@
-import { useRouter } from 'next/router'
 import { Fragment } from 'react'
-import { getEventById } from '../../api/api-methods'
+import { getAllEvents, getEventById } from '../../api/api-methods'
 
 import EventSummary from '../../components/event-detail/event-summary'
 import EventLogistics from '../../components/event-detail/event-logistics'
@@ -36,8 +35,22 @@ function EventDetailPage(props) {
 
 export default EventDetailPage
 
-export async function getServerSideProps(context) {
-  const eventId = context.params.eventId
+export async function getStaticPaths() {
+  const data = await getAllEvents()
+
+  const pathsWithPrams = data.map((event) => ({
+    params: { eventId: event.id },
+  }))
+
+  return {
+    paths: pathsWithPrams,
+    fallback: false,
+  }
+}
+
+export async function getStaticProps(context) {
+  const { params } = context
+  const eventId = params.eventId
   const event = await getEventById(eventId)
 
   return {
