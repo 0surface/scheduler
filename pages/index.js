@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { getFeaturedEvents, transformEventData } from '../api/api-methods'
+import { getFeaturedEvents } from '../api/api-methods'
 import EventList from '../components/events/EventList'
 
 function HomePage(props) {
@@ -16,11 +16,7 @@ function HomePage(props) {
 export default HomePage
 
 export async function getStaticProps() {
-  const { FIREBASE_API_URL } = process.env
-  const response = await fetch(`${FIREBASE_API_URL}/events.json`)
-  const data = await response.json()
-  const featured = getFeaturedEvents(transformEventData(data))
-
+  const featured = await getFeaturedEvents()
   return {
     props: {
       featuredEvents: featured,
