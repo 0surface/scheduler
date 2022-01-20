@@ -1,5 +1,6 @@
 import useSWR from 'swr'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 import { Fragment, useEffect, useState } from 'react'
 
 import { transformEventData } from '../../api/api-methods'
@@ -67,10 +68,17 @@ function FiltredEventsPage(props) {
   const date = new Date(filterData.numYear, filterData.numMonth - 1)
 
   return (
-    <div>
+    <Fragment>
+      <Head>
+        <title>Filtered Events</title>
+        <meta
+          name="description"
+          content={`All events for ${filterData.numMonth}/${filterData.numYear}`}
+        />
+      </Head>
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
-    </div>
+    </Fragment>
   )
 }
 
