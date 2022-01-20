@@ -1,13 +1,36 @@
-import { Fragment } from 'react'
+import useSWR from 'swr'
+import { useRouter } from 'next/router'
+import { Fragment, useEffect, useState } from 'react'
 
-import { getFilteredEvents } from '../../api/api-methods'
+import { transformEventData } from '../../api/api-methods'
 import Button from '../../components/ui/button'
 import ErrorAlert from '../../components/ui/error-alert'
 import EventList from '../../components/events/EventList'
 import ResultsTitle from '../../components/events/results-title'
 
 function FiltredEventsPage(props) {
-  if (props.hasError) {
+  const [loadedEvents, setLoadedEvents] = useState()
+  const router = useRouter()
+
+  const { data, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_FIREBASE_API_URL}/events.json`,
+    (url) => fetch(url).then((res) => res.json()),
+  )
+  console.log('data:', data)
+  useEffect(() => {
+    if (data) {
+      const events = transformEventData(data)
+      setLoadedEvents(events)
+    }
+  }, [data])
+
+  if (!loadedEvents) {
+    return <p className="center">Loading...</p>
+  }
+
+  const filterData = getSlugData(router.query.slug)
+
+  if (error || !filterData.isValid) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -20,9 +43,15 @@ function FiltredEventsPage(props) {
     )
   }
 
-  const { numYear, numMonth, filteredEvents, hasEvents } = props
+  const filteredEvents = loadedEvents.filter((event) => {
+    const eventDate = new Date(event.date)
+    return (
+      eventDate.getFullYear() === filterData.numYear &&
+      eventDate.getMonth() === filterData.numMonth - 1
+    )
+  })
 
-  if (!hasEvents) {
+  if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -35,7 +64,7 @@ function FiltredEventsPage(props) {
     )
   }
 
-  const date = new Date(numYear, numMonth - 1)
+  const date = new Date(filterData.numYear, filterData.numMonth - 1)
 
   return (
     <div>
@@ -65,31 +94,4 @@ function getSlugData(filterData) {
       : true
 
   return { numYear, numMonth, isValid }
-}
-
-export async function getServerSideProps(context) {
-  const { numYear, numMonth, isValid } = getSlugData(context.params.slug)
-
-  if (!isValid) {
-    return {
-      props: {
-        hasError: true,
-      },
-    }
-  }
-
-  const filteredEvents = await getFilteredEvents({
-    year: numYear,
-    month: numMonth,
-  })
-
-  return {
-    props: {
-      numYear,
-      numMonth,
-      filteredEvents,
-      hasError: false,
-      hasEvents: filteredEvents && filteredEvents.length > 0,
-    },
-  }
 }

@@ -1,5 +1,5 @@
 const { FIREBASE_API_URL } = process.env
-const FIREBASE_API_EVENTS_URL = `${FIREBASE_API_URL}/events.json` ///process.env
+const FIREBASE_API_EVENTS_URL = `${FIREBASE_API_URL}/events.json`
 
 export function transformEventData(data) {
   const transformed = []
