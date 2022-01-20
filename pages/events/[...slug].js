@@ -7,9 +7,7 @@ import EventList from '../../components/events/EventList'
 import ResultsTitle from '../../components/events/results-title'
 
 function FiltredEventsPage(props) {
-  const { slugIsValid, numYear, numMonth, filteredEvents, hasEvents } = props
-
-  if (!slugIsValid) {
+  if (props.hasError) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -21,6 +19,8 @@ function FiltredEventsPage(props) {
       </Fragment>
     )
   }
+
+  const { numYear, numMonth, filteredEvents, hasEvents } = props
 
   if (!hasEvents) {
     return (
@@ -68,29 +68,27 @@ function getSlugData(filterData) {
 }
 
 export async function getServerSideProps(context) {
-  let filteredEvents = []
-  let numYear
-  let numMonth
-  const slug = getSlugData(context.params.slug)
-  const slugIsValid = slug && slug.isValid
-  if (slugIsValid) {
-    numYear = slug.numYear
-    numMonth = slug.numMonth
+  const { numYear, numMonth, isValid } = getSlugData(context.params.slug)
+
+  if (!isValid) {
+    return {
+      props: {
+        hasError: true,
+      },
+    }
   }
 
-  if (slugIsValid) {
-    filteredEvents = await getFilteredEvents({
-      year: numYear,
-      month: numMonth,
-    })
-  }
+  const filteredEvents = await getFilteredEvents({
+    year: numYear,
+    month: numMonth,
+  })
 
   return {
     props: {
-      slugIsValid,
       numYear,
       numMonth,
       filteredEvents,
+      hasError: false,
       hasEvents: filteredEvents && filteredEvents.length > 0,
     },
   }

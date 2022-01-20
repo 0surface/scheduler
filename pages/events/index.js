@@ -4,30 +4,30 @@ import EventList from '../../components/events/EventList'
 import EventsSearch from '../../components/events/EventsSearch'
 
 function AllEventsPage(props) {
+  const { events } = props
   const router = useRouter()
 
   function findEventsHandler(year, month) {
-    const fullPath = `/events/${year}/${month}`
-    router.push(fullPath)
+    router.push(`/events/${year}/${month}`)
   }
 
   return (
     <div>
       <EventsSearch onSearch={findEventsHandler} />
-      <EventList items={props.allEvents} />
+      <EventList items={events} />
     </div>
   )
 }
 
 export default AllEventsPage
 
-export async function getServerSideProps(context) {
-  const allEvents = await getAllEvents()
+export async function getStaticProps(context) {
+  const events = await getAllEvents()
 
   return {
     props: {
-      allEvents,
-      hasEvents: allEvents && allEvents.length > 0,
+      events,
     },
+    revalidate: 60,
   }
 }
