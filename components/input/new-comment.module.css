@@ -36,7 +36,19 @@
   width: 100%;
   background-color: #dcfff9;
 }
-
+/* 
 .form button {
   background-color: white;
+  z-index: 1;
+} */
+
+.form button {
+  z-index: 5;
+  width: 100%;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+  background-color: #03be9f;
+  border: 1px solid #03be9f;
+  color: #dafff7;
+  border-radius: 4px;
 }

@@ -1,23 +1,28 @@
-import classes from './comment-list.module.css';
+import { useState, Fragment } from 'react'
+import classes from './comment-list.module.css'
 
-function CommentList() {
+function CommentList(props) {
+  const { comments } = props
+
   return (
-    <ul className={classes.comments}>
-      {/* Render list of comments - fetched from API */}
-      <li>
-        <p>My comment is amazing!</p>
-        <div>
-          By <address>Maximilian</address>
-        </div>
-      </li>
-      <li>
-        <p>My comment is amazing!</p>
-        <div>
-          By <address>Maximilian</address>
-        </div>
-      </li>
-    </ul>
-  );
+    <Fragment>
+      <ul className={classes.comments}>
+        {/* Render list of comments - fetched from API */}
+        {comments && comments.length > 0 ? (
+          comments.map((item) => (
+            <li key={item.id}>
+              <p>{item.text}</p>
+              <div>
+                By <address>{item.name}</address>
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No comments yet</p>
+        )}
+      </ul>
+    </Fragment>
+  )
 }
 
-export default CommentList;
+export default CommentList
