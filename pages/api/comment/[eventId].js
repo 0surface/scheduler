@@ -1,48 +1,71 @@
+import { transformCommentData } from '../../../api/api-methods'
+
+const { FIREBASE_API_URL } = process.env
+const COMMENTS_ENDPOINT = `${FIREBASE_API_URL}/comments.json`
+
+async function getComments() {
+  const callRsp = await fetch(COMMENTS_ENDPOINT)
+  const data = await callRsp.json()
+  const transformedData = transformCommentData(data)
+
+  return transformedData
+}
+
+async function setComment(newComment) {
+  const response = await fetch(COMMENTS_ENDPOINT, {
+    method: 'POST',
+    body: JSON.stringify(newComment),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  if (response) {
+    return
+  } else {
+    throw error
+  }
+}
+
 function handler(req, res) {
+  const eventId = req.query.eventId
   if (req.method === 'POST') {
-    const eventId = req.query.eventId
-    console.log('POST:eventId::', eventId, req.query)
-
-    const reqBody = req.reqBody
-    const email = req.body.email
-    const text = req.body.text
-    const name = req.body.name
-
-    console.log('POST:reqBody::', req.body)
+    const { email, name, text } = req.body
 
     const newComment = {
       id: new Date().toISOString(),
+      eventId,
       email,
       name,
       text,
     }
 
-    res.status(201).json({
-      message: 'comment received',
-      comment: JSON.stringify(newComment),
-    })
+    try {
+      setComment(newComment)
+
+      res.status(201).json({
+        message: 'comment received',
+        comment: JSON.stringify(newComment),
+      })
+    } catch (error) {
+      res.status(501).json({
+        message: 'Firebase POST call failed',
+        comment: JSON.stringify(newComment),
+      })
+    }
   } else if (req.method === 'GET') {
-    const dummyData = [
-      {
-        id: 1,
-        email: 'hithere@test.com',
-        name: 'James',
-        text: 'this is a good article, i liked it.',
-      },
-      {
-        id: 2,
-        email: 'zho01@test.com',
-        name: 'Zaho',
-        text: 'Some of the concepts in this news letter are advanced',
-      },
-      {
-        id: 3,
-        email: 'more@test.com',
-        name: 'Bolder',
-        text: 'This was useful, thank you. When can we expect the next iteration?',
-      },
-    ]
-    res.status(200).json({ comments: JSON.stringify(dummyData) })
+    try {
+      getComments().then((comments) => {
+        const commentsByEvent = comments.filter(
+          (comment) => comment.eventId === eventId,
+        )
+        res.status(200).json({ comments: commentsByEvent })
+      })
+    } catch (error) {
+      res.status(501).json({
+        message: 'Firebase GET call failed',
+        comments: [],
+      })
+    }
   } else {
     res.status(200).json({ status: 'success' })
   }

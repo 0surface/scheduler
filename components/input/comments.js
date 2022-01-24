@@ -18,17 +18,21 @@ function Comments(props) {
     fetch(`/api/comment/${eventId}`)
       .then((response) => response.json())
       .then((data) => {
-        const comments = JSON.parse(data.comments)
-        console.log('comment data fected::', comments)
+        const comments = data.comments
+        console.log('comment data fetched::', data)
         setCommentData(comments)
       })
   }, [eventId])
 
   function addCommentHandler(commentData) {
+    const newComment = {
+      id: eventId,
+      ...commentData,
+    }
     // send data to API
     fetch(`/api/comment/${eventId}`, {
       method: 'POST',
-      body: JSON.stringify(commentData),
+      body: JSON.stringify(newComment),
       headers: {
         'Content-Type': 'application/json',
       },

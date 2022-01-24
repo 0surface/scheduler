@@ -1,6 +1,17 @@
 const { FIREBASE_API_URL } = process.env
 const FIREBASE_API_EVENTS_URL = `${FIREBASE_API_URL}/events.json`
 
+export function transformCommentData(data) {
+  const transformed = []
+  for (const key in data) {
+    transformed.push({
+      ...data[key],
+    })
+  }
+
+  return transformed
+}
+
 export function transformEventData(data) {
   const transformed = []
   for (const key in data) {
