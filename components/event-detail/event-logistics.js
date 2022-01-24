@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import Image from 'next/image'
 import AddressIcon from '../icons/address-icon'
 import DateIcon from '../icons/date-icon'
 import LogisticsItem from './logistics-item'
@@ -18,6 +19,7 @@ function EventLogistics(props) {
     <section className={classes.logistics}>
       <div className={classes.image}>
         <img src={`/${image}`} alt={imageAlt} />
+        <Image src={`/${image}`} alt={imageAlt} width={240} height={240} />
       </div>
       <ul className={classes.list}>
         <LogisticsItem icon={DateIcon}>

@@ -1,5 +1,6 @@
 import useSWR from 'swr'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 import { Fragment, useEffect, useState } from 'react'
 
 import { transformEventData } from '../../api/api-methods'
@@ -9,14 +10,21 @@ import EventList from '../../components/events/EventList'
 import ResultsTitle from '../../components/events/results-title'
 
 function FiltredEventsPage(props) {
-  const [loadedEvents, setLoadedEvents] = useState()
   const router = useRouter()
+  const [loadedEvents, setLoadedEvents] = useState()
 
   const { data, error } = useSWR(
     `${process.env.NEXT_PUBLIC_FIREBASE_API_URL}/events.json`,
     (url) => fetch(url).then((res) => res.json()),
   )
-  console.log('data:', data)
+
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name="description" content="A list of  filtered events" />
+    </Head>
+  )
+
   useEffect(() => {
     if (data) {
       const events = transformEventData(data)
@@ -24,15 +32,21 @@ function FiltredEventsPage(props) {
     }
   }, [data])
 
-  if (!loadedEvents) {
-    return <p className="center">Loading...</p>
-  }
-
   const filterData = getSlugData(router.query.slug)
+
+  if (!loadedEvents) {
+    return (
+      <Fragment>
+        {pageHeadData}
+        <p className="center">Loading...</p>
+      </Fragment>
+    )
+  }
 
   if (error || !filterData.isValid) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>Invalid Filter. Please adjust your values.</p>
         </ErrorAlert>
@@ -42,6 +56,16 @@ function FiltredEventsPage(props) {
       </Fragment>
     )
   }
+
+  pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`All events for ${filterData.numMonth}/${filterData.numYear}`}
+      />
+    </Head>
+  )
 
   const filteredEvents = loadedEvents.filter((event) => {
     const eventDate = new Date(event.date)
@@ -54,6 +78,7 @@ function FiltredEventsPage(props) {
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>No Events found for the chosen filter!</p>
         </ErrorAlert>
@@ -67,16 +92,20 @@ function FiltredEventsPage(props) {
   const date = new Date(filterData.numYear, filterData.numMonth - 1)
 
   return (
-    <div>
+    <Fragment>
+      {pageHeadData}
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
-    </div>
+    </Fragment>
   )
 }
 
 export default FiltredEventsPage
 
 function getSlugData(filterData) {
+  if (!filterData) {
+    return { isValid: false }
+  }
   const filteredYear = filterData[0]
   const filteredMonth = filterData[1]
 
