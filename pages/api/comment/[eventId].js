@@ -45,9 +45,9 @@ function handler(req, res) {
   if (req.method === 'POST') {
     const { email, name, text } = req.body
 
-    const validation = validateCommentData(email, name, text)
-    if (validation.error) {
-      res.status(422).json({ message: JSON.stringify(validation.message) })
+    const { message, error } = validateCommentData(email, name, text)
+    if (error) {
+      res.status(422).json({ message: JSON.stringify(message) })
       return
     }
 
@@ -67,7 +67,7 @@ function handler(req, res) {
         comment: JSON.stringify(newComment),
       })
     } catch (error) {
-      res.status(501).json({
+      res.status(500).json({
         message: 'Firebase POST call failed',
         comment: JSON.stringify(newComment),
       })
@@ -81,7 +81,7 @@ function handler(req, res) {
         res.status(200).json({ comments: commentsByEvent })
       })
     } catch (error) {
-      res.status(501).json({
+      res.status(500).json({
         message: 'Firebase GET call failed',
         comments: [],
       })
