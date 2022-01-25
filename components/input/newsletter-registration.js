@@ -4,23 +4,21 @@ import classes from './newsletter-registration.module.css'
 import { ValidateEmail } from '../../helpers/helper-methods'
 
 function NewsletterRegistration() {
-  const inputNewsletter = useRef()
+  const userEmail = useRef()
   const [emailIsValid, setEmailIsValid] = useState(true)
 
   function registrationHandler(event) {
     event.preventDefault()
 
     // fetch user input (state or refs)
-    const inputEmail = inputNewsletter.current.value
-    console.log('inputNewsletter.current.value', inputEmail)
+    const inputEmail = userEmail.current.value
 
     // optional: validate input
     const emailIsValid = ValidateEmail(inputEmail)
-    console.log('emailIsValid::', emailIsValid)
+
     setEmailIsValid(emailIsValid)
 
     if (!emailIsValid) {
-      console.log(`Invalid email : ${inputEmail}`)
       return
     }
 
@@ -29,6 +27,9 @@ function NewsletterRegistration() {
     fetch(`/api/newsletter`, {
       method: 'POST',
       body: JSON.stringify(reqBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
       .then((response) => response.json())
       .then((data) =>
@@ -50,7 +51,7 @@ function NewsletterRegistration() {
             id="email"
             placeholder="Your email"
             aria-label="Your email"
-            ref={inputNewsletter}
+            ref={userEmail}
           />
 
           <button onClick={registrationHandler}>Register</button>
