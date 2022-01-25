@@ -26,10 +26,30 @@ async function setComment(newComment) {
   }
 }
 
+function validateCommentData(email, name, text) {
+  let validation = { message: '', error: false }
+
+  const message =
+    !email || !email.includes('@')
+      ? 'Invalid email address'
+      : !name
+      ? 'Invalid name value'
+      : text.length > 500
+      ? 'Comment length above allowed'
+      : ''
+  return { message, error: message.length > 0 }
+}
+
 function handler(req, res) {
   const eventId = req.query.eventId
   if (req.method === 'POST') {
     const { email, name, text } = req.body
+
+    const validation = validateCommentData(email, name, text)
+    if (validation.error) {
+      res.status(422).json({ message: JSON.stringify(validation.message) })
+      return
+    }
 
     const newComment = {
       id: new Date().toISOString(),
