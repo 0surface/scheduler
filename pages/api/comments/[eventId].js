@@ -25,8 +25,6 @@ function handler(req, res) {
       eventId,
     }
 
-    console.log('NewComment', newComment)
-
     res.status(200).json({ message: 'Added comment', comment: newComment })
   }
 
