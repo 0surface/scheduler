@@ -1,24 +1,29 @@
-import { MongoClient } from 'mongodb'
-
-const { MONGODB_URI } = process.env
+import { connectDatabase, insertDocument } from '../../helpers/db-util'
 
 async function handler(req, res) {
   if (req.method === 'POST') {
     const userEmail = req.body.email
+
     if (!userEmail || !userEmail.includes('@')) {
       res.status(422).json({ message: 'Invalid email adderss' })
       return
     }
 
-    const newsletterUri = MONGODB_URI.replace('events', 'newsletter')
+    let client
 
-    const client = await MongoClient.connect(newsletterUri)
+    try {
+      client = await connectDatabase('newsletter')
+    } catch (error) {
+      res.status(500).json({ message: 'Connecting to the database failed' })
+      return
+    }
 
-    const db = client.db()
-
-    await db.collection('emails').insertOne({
-      email: userEmail,
-    })
+    try {
+      await insertDocument(client, 'emails', { email: userEmail })
+    } catch (error) {
+      res.status(500).json({ message: 'Inserting data failed' })
+      return
+    }
 
     client.close()
 

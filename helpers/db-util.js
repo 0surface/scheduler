@@ -1,8 +1,12 @@
 import { MongoClient } from 'mongodb'
+
 const { MONGODB_URI } = process.env
 
-export async function connectDatabase() {
-  const client = await MongoClient.connect(MONGODB_URI)
+export async function connectDatabase(dbName = 'events') {
+  const uri =
+    dbName && dbName !== undefined && MONGODB_URI.replace('mydb', dbName)
+
+  const client = await MongoClient.connect(uri)
 
   return client
 }
