@@ -1,3 +1,4 @@
+import { getAllDocuments, insertDocument } from '../../../helpers/db-util'
 import { MongoClient } from 'mongodb'
 const { MONGODB_URI } = process.env
 
@@ -32,7 +33,7 @@ async function handler(req, res) {
 
     const db = client.db()
 
-    const result = await db.collection('comments').insertOne(newComment)
+    const result = await insertDocument(client, 'comments', newComment)
 
     const newId = result.insertedId.toString()
 
@@ -44,11 +45,12 @@ async function handler(req, res) {
   if (req.method === 'GET') {
     const db = client.db()
 
-    const documents = await db
-      .collection('comments')
-      .find()
-      .sort({ _id: -1 }) //desc order, latest first by _id
-      .toArray()
+    const documents = await getAllDocuments(
+      client,
+      'comments',
+      { _id: -1 },
+      { eventId: eventId },
+    )
 
     res.status(200).json({ comments: documents })
   }
