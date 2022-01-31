@@ -42,12 +42,15 @@ async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    const dummy_Data = [
-      { id: 'c1', name: 'Max', text: 'this is my first comment' },
-      { id: 'c2', name: 'Manchester', text: 'this is my second comment' },
-    ]
+    const db = client.db()
 
-    res.status(200).json({ comments: dummy_Data })
+    const documents = await db
+      .collection('comments')
+      .find()
+      .sort({ _id: -1 }) //desc order, latest first by _id
+      .toArray()
+
+    res.status(200).json({ comments: documents })
   }
 
   client.close()
