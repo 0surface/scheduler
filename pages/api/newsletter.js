@@ -10,7 +10,9 @@ async function handler(req, res) {
       return
     }
 
-    const client = await MongoClient.connect(MONGODB_URI)
+    const newsletterUri = MONGODB_URI.replace('events', 'newsletter')
+
+    const client = await MongoClient.connect(newsletterUri)
 
     const db = client.db()
 
