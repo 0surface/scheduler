@@ -27,7 +27,7 @@ function Comments(props) {
           setIsFetchingComments(false)
         })
     }
-  }, [showComments])
+  }, [showComments, eventId])
 
   function addCommentHandler(commentData) {
     notificationCtx.showNotification({

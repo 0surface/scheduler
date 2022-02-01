@@ -1,3 +1,10 @@
+## The App
+
+This is a simple App that displays events to come, allows comments to be added and registers emails for a (fictitious) newsletter.
+It uses Firebase for the events data, Mongodb Cloud for comments and newsletter emails.
+
+![FIREBASE](https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Firebase_Logo.svg/320px-Firebase_Logo.svg.png) ![MongoDB](https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/320px-MongoDB_Logo.svg.png) ![Next.js](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/207px-Nextjs-logo.svg.png)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

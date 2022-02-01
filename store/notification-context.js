@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from 'react'
 
 const NotificationContext = createContext({
-  notification: null, //{ title, message, status}
+  notification: null,
   showNotification: function (notificationData) {},
   hideNotification: function () {},
 })
